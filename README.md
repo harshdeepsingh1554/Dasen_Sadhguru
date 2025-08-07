@@ -48,7 +48,7 @@ A web-based solution that allows users to select their current mood and receive 
 
 ## 📦 How to Run the Project
 
-1. *Clone the repository:*
-   ```bash
-   git clone https://github.com/yourusername/sadhguru-chatbot.git
-   cd sadhguru-chatbot
+
+1. render deploy link
+   click the link
+   https://dasen-sadhguruu.onrender.com
