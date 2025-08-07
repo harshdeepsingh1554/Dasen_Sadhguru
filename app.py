@@ -1,14 +1,19 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 from pymongo import MongoClient
+from pymongo.server_api import ServerApi
 import requests
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
 
 # MongoDB setup
-client = MongoClient('mongodb://localhost:27017/')
-db = client['quotes_db']
 
+
+
+uri = "mongodb+srv://harshupocof1:<db_password>@cluster0.9trtciw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+# Create a new client and connect to the server
+client = MongoClient(uri, server_api=ServerApi('1'))
+db = client['quotes_db']
 
 # Hardcoded admin credentials
 ADMIN_USER = 'admin'
@@ -102,4 +107,5 @@ def add_quote():
 
     return render_template('add_quote.html')
 if __name__ == '__main__':
+
     app.run(debug=True)
