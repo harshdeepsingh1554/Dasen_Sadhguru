@@ -5,13 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sign In / Sign Up</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
     body {
       background-color: #0a0a0a;
       display: flex;
@@ -20,7 +14,6 @@
       height: 100vh;
       color: white;
     }
-
     .container {
       background: #1a1a1a;
       padding: 30px;
@@ -28,72 +21,39 @@
       width: 350px;
       position: relative;
     }
-
     .container::before {
       content: "";
       position: absolute;
-      top: -4px;
-      left: -4px;
-      right: -4px;
-      bottom: -4px;
+      top: -4px; left: -4px; right: -4px; bottom: -4px;
       z-index: -1;
       background: linear-gradient(270deg, #656565, #7f42a7, #6600c5, #5300a0, #757575, #656565);
       background-size: 1400% 1400%;
       border-radius: 14px;
       animation: rainbowBorder 2.5s linear infinite;
     }
-
     @keyframes rainbowBorder {
-      0% {
-        background-position: 0% 50%;
-      }
-      100% {
-        background-position: 100% 50%;
-      }
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
     }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #b266ff;
-    }
-
+    h2 { text-align: center; margin-bottom: 20px; color: #b266ff; }
     input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      background: #2b2b2b;
-      border: 1px solid #8000ff;
-      color: white;
-      border-radius: 5px;
+      width: 100%; padding: 10px; margin: 10px 0;
+      background: #2b2b2b; border: 1px solid #8000ff;
+      color: white; border-radius: 5px;
     }
-
     button {
-      width: 100%;
-      padding: 10px;
-      background: #4b0082; /* dark purple */
-      border: none;
-      color: white;
-      font-size: 16px;
-      border-radius: 5px;
-      cursor: pointer;
+      width: 100%; padding: 10px;
+      background: #4b0082; border: none; color: white;
+      font-size: 16px; border-radius: 5px; cursor: pointer;
       margin-top: 10px;
     }
-
-    .toggle {
-      text-align: center;
-      margin-top: 15px;
-      color: #ccc;
-    }
-
-    .toggle a {
-      color: #b266ff;
-      text-decoration: none;
-      cursor: pointer;
-    }
+    .toggle { text-align: center; margin-top: 15px; color: #ccc; }
+    .toggle a { color: #b266ff; text-decoration: none; cursor: pointer; }
   </style>
 </head>
+
 <body>
+  <a href="/" class="nav-btn">Home</a>
   <div class="container" id="formContainer">
     <h2 id="formTitle">Sign In</h2>
     <input type="text" id="username" placeholder="Username" />
@@ -101,6 +61,7 @@
     <button onclick="submitForm()">Submit</button>
     <div class="toggle">
       <span id="toggleText">Don't have an account? <a onclick="toggleForm()">Sign Up</a></span>
+      <p id="errorMsg">{{ error }}</p>
     </div>
   </div>
 
@@ -110,8 +71,8 @@
     function toggleForm() {
       const title = document.getElementById("formTitle");
       const toggleText = document.getElementById("toggleText");
-      const username = document.getElementById("username");
-      const password = document.getElementById("password");
+      document.getElementById("username").value = "";
+      document.getElementById("password").value = "";
 
       isSignIn = !isSignIn;
       if (isSignIn) {
@@ -121,18 +82,51 @@
         title.textContent = "Sign Up";
         toggleText.innerHTML = `Already have an account? <a onclick="toggleForm()">Sign In</a>`;
       }
-
-      username.value = "";
-      password.value = "";
     }
 
-    function submitForm() {
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-      if (username && password) {
-        alert(`${isSignIn ? "Signing in" : "Signing up"} as ${username}`);
-      } else {
+    async function submitForm() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!username || !password) {
         alert("Please enter both username and password.");
+        return;
+      }
+
+      try {
+        const response = await fetch("/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: username,
+            password: password,
+            action: isSignIn ? 'signin' : 'signup'
+          })
+        });
+
+        // If backend sends JSON
+        const data = await response.json().catch(() => null);
+
+        if (response.redirected) {
+          // Flask redirected (e.g., admin to add_quote page)
+          window.location.href = response.url;
+          return;
+        }
+
+        if (data && data.success) {
+          alert(data.message || "Success!");
+          if (isSignIn) {
+            window.location.href = "/"; // redirect to home
+          } else {
+            toggleForm(); // switch to sign in after signup
+          }
+        } else {
+          alert(data?.message || "Invalid credentials");
+        }
+
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Something went wrong while logging in.");
       }
     }
   </script>
