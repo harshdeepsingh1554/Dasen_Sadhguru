@@ -11,7 +11,7 @@ app.secret_key = 'your-secret-key'
 
 
 
-uri = "mongodb+srv://harshupocof1:<db_password>@cluster0.9trtciw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+uri = "mongodb+srv://harshupocof1:Lh8.v!rV_ZnkY3w@cluster0.9trtciw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 # Create a new client and connect to the server
 client = MongoClient(uri, server_api=ServerApi('1'))
 db = client['quotes_db']
@@ -110,6 +110,7 @@ def add_quote():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))  # Render sets PORT env variable
     app.run(host="0.0.0.0", port=port)
+
 
 
 
