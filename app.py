@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for, s
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 import requests
+import os
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
@@ -107,6 +108,7 @@ def add_quote():
 
     return render_template('add_quote.html')
 if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))  # Render sets PORT env variable
+    app.run(host="0.0.0.0", port=port)e)
 
-    app.run(debug=True)
 
