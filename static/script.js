@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const sendBtn = document.getElementById("sendBtn");
 const userInput = document.getElementById("userInput");
 const chatDisplay = document.getElementById("chatDisplay");
-addMessage("Namaste , So how you are feeling Today ", "user");
+addMessage("Namaste , So how you are feeling Today. If unfind Type 'random' for Random quotes ", "user");
 sendBtn.addEventListener("click", async () => {
   const userMsg = userInput.value.trim();
   
@@ -90,3 +90,4 @@ window.addEventListener("scroll", () => {
     }
   }
 });
+
