@@ -1,11 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign In / Sign Up</title>
+  <title>login</title>
+  <a href="/" class="nav-btn">Home</a>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
     body {
       background-color: #0a0a0a;
       display: flex;
@@ -14,6 +22,7 @@
       height: 100vh;
       color: white;
     }
+
     .container {
       background: #1a1a1a;
       padding: 30px;
@@ -21,39 +30,87 @@
       width: 350px;
       position: relative;
     }
+
     .container::before {
       content: "";
       position: absolute;
-      top: -4px; left: -4px; right: -4px; bottom: -4px;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
       z-index: -1;
       background: linear-gradient(270deg, #656565, #7f42a7, #6600c5, #5300a0, #757575, #656565);
       background-size: 1400% 1400%;
       border-radius: 14px;
       animation: rainbowBorder 2.5s linear infinite;
     }
+
+    .nav-btn {
+      margin-top: -50vh;
+      margin-right: -10vh;
+      color: white;
+      text-decoration: none;
+      padding: 10px 18px;
+      border: 1px solid white;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: background 0.3s ease;
+    }
+
     @keyframes rainbowBorder {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 100% 50%; }
+      0% {
+        background-position: 0% 50%;
+      }
+
+      100% {
+        background-position: 100% 50%;
+      }
     }
-    h2 { text-align: center; margin-bottom: 20px; color: #b266ff; }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #b266ff;
+    }
+
     input {
-      width: 100%; padding: 10px; margin: 10px 0;
-      background: #2b2b2b; border: 1px solid #8000ff;
-      color: white; border-radius: 5px;
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      background: #2b2b2b;
+      border: 1px solid #8000ff;
+      color: white;
+      border-radius: 5px;
     }
+
     button {
-      width: 100%; padding: 10px;
-      background: #4b0082; border: none; color: white;
-      font-size: 16px; border-radius: 5px; cursor: pointer;
+      width: 100%;
+      padding: 10px;
+      background: #4b0082;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
       margin-top: 10px;
     }
-    .toggle { text-align: center; margin-top: 15px; color: #ccc; }
-    .toggle a { color: #b266ff; text-decoration: none; cursor: pointer; }
+
+    .toggle {
+      text-align: center;
+      margin-top: 15px;
+      color: #ccc;
+    }
+
+    .toggle a {
+      color: #b266ff;
+      text-decoration: none;
+      cursor: pointer;
+    }
   </style>
 </head>
 
 <body>
-  <a href="/" class="nav-btn">Home</a>
+
   <div class="container" id="formContainer">
     <h2 id="formTitle">Sign In</h2>
     <input type="text" id="username" placeholder="Username" />
@@ -104,31 +161,27 @@
           })
         });
 
-        // If backend sends JSON
-        const data = await response.json().catch(() => null);
+        const data = await response.json();
 
-        if (response.redirected) {
-          // Flask redirected (e.g., admin to add_quote page)
-          window.location.href = response.url;
-          return;
-        }
+        if (data.success) {
 
-        if (data && data.success) {
-          alert(data.message || "Success!");
-          if (isSignIn) {
-            window.location.href = "/"; // redirect to home
-          } else {
-            toggleForm(); // switch to sign in after signup
+          if (data.redirect) {
+            window.location.href = `${data.redirect}?username=${encodeURIComponent(data.username)}`;
+          } else if (!isSignIn) {
+            toggleForm(); // Switch to sign in after signup
           }
         } else {
-          alert(data?.message || "Invalid credentials");
+          alert(data.message);
         }
+
 
       } catch (error) {
         console.error("Error:", error);
         alert("Something went wrong while logging in.");
       }
     }
+
   </script>
 </body>
+
 </html>
