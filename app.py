@@ -23,7 +23,13 @@ ADMIN_PASS = 'password'
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('home.html')
+    return render_template('index.html')
+
+
+@app.route('/user_dashboard', methods=['GET'])
+def home():
+    username = session.get('username')
+    return render_template('home.html',username=username)
 
 
 @app.route('/chat', methods=['POST'])
@@ -71,20 +77,43 @@ def chat():
 def login():
     if request.method == 'POST':
         collection = db['users']
-        if request.form['username'] == ADMIN_USER and request.form['password'] == ADMIN_PASS:
-            session['admin'] = True
-            return redirect(url_for('add_quote'))
-        else:
-            return render_template('login.html', error='Invalid credentials')
+        data = request.get_json()
+        action = data.get("action")
 
+        username = data.get('username')
+        password = data.get('password')
+
+        if action == "signin":
+            if username == ADMIN_USER and password == ADMIN_PASS:
+                session['admin'] = True
+                return jsonify({"success": True, "message": "Admin login successful", "redirect": "/add_quote"})
+
+            user = collection.find_one({"username": username})
+            if user and user['password'] == password:
+                session['user'] = True
+                session['username'] = username.upper()
+                return jsonify({"success": True, 
+                                "message": "Login successful", 
+                                "redirect": "/user_dashboard",
+                                "username": username })
+            else:
+                return jsonify({"success": False, "message": "Invalid credentials"}), 401
+
+        elif action == "signup":
+            if collection.find_one({"username": username}):
+                return jsonify({"success": False, "message": "Username already exists"}), 400
+
+            collection.insert_one({"username": username, "password": password})
+            return jsonify({"success": True, "message": "User created successfully. Please log in."})
+
+    # GET request → return HTML page
     return render_template('login.html')
 
 
 @app.route('/logout')
 def logout():
-    session.pop('admin', None)
+    session.clear()
     return redirect(url_for('login'))
-
 
 # ---------- Add Quote Page ----------
 @app.route('/add-quote', methods=['GET', 'POST'])
@@ -110,6 +139,7 @@ def add_quote():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))  # Render sets PORT env variable
     app.run(host="0.0.0.0", port=port)
+
 
 
 
